@@ -11,4 +11,5 @@ Software:
 * Platform.io
 
 NEC Beamer Communication:
-* [https://www.sharpnecdisplays.eu/p/download/cp/Products/Projectors/Shared/CommandLists/PDF-ExternalControlManual-english.pdf?fn=ExternalControlManual-english.pdf]
+* Binary Format [https://www.sharpnecdisplays.eu/p/download/cp/Products/Projectors/Shared/CommandLists/PDF-ExternalControlManual-english.pdf?fn=ExternalControlManual-english.pdf]
+* ASCII Format [https://www.sharp-nec-displays.com/support/webdl/dl_service/data/sl/en/command/common_ascii_e-r1.pdf]

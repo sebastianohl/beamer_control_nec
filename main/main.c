@@ -26,6 +26,10 @@ static const char *TAG = "beamer-control";
 #define STR_(X) #X
 #define STR(X) STR_(X)
 
+#ifndef CONFIG_PARTITION_TABLE_TWO_OTA
+    #error "enable two partition layout for OTA update"
+#endif
+
 static EventGroupHandle_t wifi_event_group;
 static EventGroupHandle_t mqtt_event_group;
 
@@ -48,9 +52,9 @@ homie_handle_t homie = {
     //       .firmware = GIT_URL,
     //       .firmware_version = GIT_BRANCH" "GIT_COMMIT_HASH,
     .num_nodes = 1,
-    .nodes = {{.id = "epson-beamer",
-               .name = "Epson Beamer",
-               .type = "TW3600",
+    .nodes = {{.id = "nec-beamer",
+               .name = "NEC Beamer",
+               .type = "P525UL",
                .num_properties = 3,
                .properties =
                    {
