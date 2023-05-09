@@ -27,20 +27,18 @@ void update_power(struct homie_handle_s *handle, int node, int property)
     if (xSemaphoreTake(beamer_state.mutex, (portTickType)portMAX_DELAY) ==
         pdTRUE)
     {
-        if ((xTaskGetTickCount() - 25000 / portTICK_PERIOD_MS) >
+        if ((xTaskGetTickCount() - 15000 / portTICK_PERIOD_MS) >
             beamer_state.last_change)
         {
             const char cmd[] = "power\r\n\0";
             uart_write(&uart, cmd, strlen(cmd));
-
             uart_cycle(&uart);
-
             char value[100] = {0};
             size_t len = 99;
             uart_get_buffer(&uart, value, &len);
             char status[100] = {0};
             ESP_LOGI(TAG, "pwr value %d %s", len, value);
-            if (len > 0 && sscanf(value, "power %s", status) == 1)
+            if (len > 0 && sscanf(value, ">power %s", status) == 1)
             {
                 beamer_state.state =
                     (strcmp(status, "on") == 0) ? HOMIE_TRUE : HOMIE_FALSE;
@@ -49,7 +47,7 @@ void update_power(struct homie_handle_s *handle, int node, int property)
         }
         else
         {
-            ESP_LOGD(TAG, "skip power status request");
+            ESP_LOGI(TAG, "skip power status request");
         }
         char value[100];
         sprintf(value, "%s",
@@ -58,6 +56,10 @@ void update_power(struct homie_handle_s *handle, int node, int property)
 
         homie_publish_property_value(handle, node, property, value);
         xSemaphoreGive(beamer_state.mutex);
+    }
+    else
+    {
+        ESP_LOGI(TAG, "skip power status request, no semaphore");
     }
 }
 
@@ -91,7 +93,7 @@ void update_source(struct homie_handle_s *handle, int node, int property)
     if (xSemaphoreTake(beamer_state.mutex, (portTickType)portMAX_DELAY) ==
         pdTRUE)
     {
-        if ((xTaskGetTickCount() - 25000 / portTICK_PERIOD_MS) >
+        if ((xTaskGetTickCount() - 15000 / portTICK_PERIOD_MS) >
                 beamer_state.last_change &&
             beamer_state.state == HOMIE_TRUE)
         {
@@ -105,7 +107,7 @@ void update_source(struct homie_handle_s *handle, int node, int property)
             uart_get_buffer(&uart, value, &len);
             char source[100] = {0};
             ESP_LOGD(TAG, "source value %d %s", len, value);
-            if (len > 0 && sscanf(value, "input %s", source) == 1)
+            if (len > 0 && sscanf(value, ">input %s", source) == 1)
             {
                 ESP_LOGI(TAG, "source %s", source);
                 homie_publish_property_value(handle, node, property, source);
@@ -127,8 +129,9 @@ void write_source(struct homie_handle_s *handle, int node, int property,
     {
         if (data_len > 0)
         {
+            //  hdmi1|hdmi2|computer|hdbaset|usb-a|lan
             char cmd[100] = {0};
-            snprintf(cmd, 99, "source %s\r\n", data);
+            snprintf(cmd, 99, "input %.*s\r\n", data_len, data);
             ESP_LOGI(TAG, "set source got %d %s", strlen(cmd), cmd);
             uart_write(&uart, cmd, strlen(cmd));
         }

@@ -8,8 +8,10 @@ Configuration:
 
 Software:
 * vscode with remote containers extension 
-* Platform.io
+
+Important:
+* set the correct standby mode or your beamer will not wake up because the RS232 is also on sleep. For P525UL the mode is called "network standby"
 
 NEC Beamer Communication:
 * Binary Format [https://www.sharpnecdisplays.eu/p/download/cp/Products/Projectors/Shared/CommandLists/PDF-ExternalControlManual-english.pdf?fn=ExternalControlManual-english.pdf]
-* ASCII Format [https://www.sharp-nec-displays.com/support/webdl/dl_service/data/sl/en/command/common_ascii_e-r1.pdf]
+* ASCII Format (this is used) [https://www.sharp-nec-displays.com/support/webdl/dl_service/data/sl/en/command/common_ascii_e-r1.pdf]
