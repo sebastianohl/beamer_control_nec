@@ -1,4 +1,8 @@
 {
     "editor.formatOnSave": true,
-    "clang-format.executable": "clang-format-14"
+    "clang-format.executable": "clang-format-14",
+    "files.associations": {
+        "esp_task_wdt.h": "c",
+        "hw_timer.h": "c"
+    }
 }

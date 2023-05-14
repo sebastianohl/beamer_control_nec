@@ -4,4 +4,5 @@ idf_component_register(SRCS "main.c"
                             "beamer.c"
                             "remote_log.c"
 			                "ota.c"
+                            "watchdog.c"
                     INCLUDE_DIRS "")

@@ -15,6 +15,7 @@
 
 #include "mqtt_client.h"
 #include "remote_log.h"
+#include "watchdog.h"
 
 //#define DEBUG_SERIAL
 
@@ -334,6 +335,10 @@ void app_main(void)
     uart_init(&uart);
 #endif
 
+    ESP_LOGI(TAG, "watchdog init");
+    // will be triggered by beamer.c:update_power()
+    watchdog_init(1000 * 1000 /* 1s */, 15);
+
     for (int i = 24 * 60 * 60 / 5; i >= 0; i--)
     {
         EventBits_t uxBits;
@@ -360,6 +365,7 @@ void app_main(void)
             homie_cycle(&homie);
 #endif
         }
+
 #ifdef DEBUG_SERIAL
         vTaskDelay(5000 / portTICK_PERIOD_MS);
 #else

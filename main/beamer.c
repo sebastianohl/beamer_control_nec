@@ -1,5 +1,6 @@
 #include "beamer.h"
 #include "esp_log.h"
+#include "watchdog.h"
 
 static const char *TAG = "beamer-control";
 
@@ -37,6 +38,8 @@ void update_power(struct homie_handle_s *handle, int node, int property)
     if (xSemaphoreTake(beamer_state.mutex, (portTickType)portMAX_DELAY) ==
         pdTRUE)
     {
+        watchdog_reset(); // should be called every 5s
+
         // 60 after switch off to let beamer go to deep sleep
         if ((xTaskGetTickCount() -
              (beamer_state.state ? 30000 : 60000) / portTICK_PERIOD_MS) >
@@ -52,8 +55,18 @@ void update_power(struct homie_handle_s *handle, int node, int property)
             ESP_LOGI(TAG, "pwr value %d", len);
             if (len > 0 && value[0] == 0x20 && value[1] == 0x85)
             {
-                beamer_state.state =
-                    (value[7] == 0x01) ? HOMIE_TRUE : HOMIE_FALSE;
+                if (value[7] == 0x01)
+                {
+                    beamer_state.state = HOMIE_TRUE;
+                }
+                else
+                {
+                    // special case if beamer was switched of by remote
+                    beamer_state.last_change = beamer_state.state
+                                                   ? xTaskGetTickCount()
+                                                   : beamer_state.last_change;
+                    beamer_state.state = HOMIE_FALSE;
+                }
                 ESP_LOGI(TAG, "power status %d", beamer_state.state);
             }
         }
@@ -168,6 +181,9 @@ void update_source(struct homie_handle_s *handle, int node, int property)
         else
         {
             ESP_LOGI(TAG, "skip source request -> power off");
+            char source[100] = {0};
+            strcpy(source, "POWEROFF");
+            homie_publish_property_value(handle, node, property, source);
         }
         xSemaphoreGive(beamer_state.mutex);
     }
